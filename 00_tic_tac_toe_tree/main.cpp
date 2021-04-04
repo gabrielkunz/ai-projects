@@ -9,7 +9,6 @@ class Node {
   void placeX(Node * root, int position);
   void placeO(Node * root, int position);
   void printBoard(int position);
- 
   char board[9];
 };
 
@@ -55,7 +54,7 @@ void displayPossibilities(Node * node){
 
   for (int i = 0; i < 9; i++){
     if (node->board[i] == ' '){
-      std::cout << "Option " << std::to_string(i) <<": ";
+      std::cout << "Position " << std::to_string(i) <<": ";
       node->printBoard(i);
     }
   }
@@ -69,14 +68,14 @@ int main() {
   
   while(true){
     if (x_turn){
-      std::cout << "Choose an option to place the X: "<< std::endl;
+      std::cout << "Select a position to place the X: "<< std::endl;
       displayPossibilities(root);
       std::cin >> position;
       root->placeX(root,position);
       x_turn = false;
 
     }else{
-      std::cout << "Choose an option to place the O: "<< std::endl;
+      std::cout << "Select a position to place the O: "<< std::endl;
       displayPossibilities(root);
       std::cin >> position;
       root->placeO(root,position);
