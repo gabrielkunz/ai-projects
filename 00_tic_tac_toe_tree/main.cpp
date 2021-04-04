@@ -4,8 +4,8 @@
 
 class Node {
  public:
-  Node * next_node, * previous_node;
-  Node(Node * next_node, Node * previous_node);
+  Node * next;
+  Node(Node * next);
   Node *placeX(int position);
   Node *placeO(int position);
   void printBoard();
@@ -13,9 +13,8 @@ class Node {
   char board[9];
 };
 
-Node::Node(Node * next_node, Node * previous_node) {
-  this-> next_node = next_node;
-  this-> previous_node = previous_node;
+Node::Node(Node * next) {
+  this-> next = next;
   for (int i = 0; i < 9; i++){
     board[i] = i + '0';
   }
@@ -38,14 +37,13 @@ void Node::printBoard() {
 }
 
 void createTree(Node * root) {
-
+  root->printBoard();
 }
 
 int main() {
   Node * root;
-  root = new Node(NULL, NULL);
+  root = new Node(NULL);
 
-  root->printBoard();
   createTree(root);
 
   return 0;
