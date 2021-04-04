@@ -6,45 +6,82 @@ class Node {
  public:
   Node * next;
   Node(Node * next);
-  Node *placeX(int position);
-  Node *placeO(int position);
-  void printBoard();
- private:
+  void placeX(Node * root, int position);
+  void placeO(Node * root, int position);
+  void printBoard(int position);
+ 
   char board[9];
 };
 
 Node::Node(Node * next) {
   this-> next = next;
   for (int i = 0; i < 9; i++){
-    board[i] = i + '0';
+    board[i] = ' ';
   }
 }
 
-void Node::printBoard() {
-  for (int i = 0; i < 3; i++){
-      std::cout << board[i];
+void Node::placeX(Node * node, int position){
+  while (node->next != NULL){
+    node = node->next;
   }
-  std::cout << std::endl;
-  for (int i = 3; i < 6; i++){
-      
-      std::cout << board[i];
+
+  node->board[position] = 'X';
+
+}
+
+void Node::placeO(Node * node, int position){
+  while (node->next != NULL){
+    node = node->next;
   }
-  std::cout << std::endl;
-  for (int i = 6; i < 9; i++){
-      std::cout << board[i];
+
+  node->board[position] = 'O';
+}
+
+void Node::printBoard(int position) {
+  for (int i = 0; i < 9; i++){
+    if (i == position){
+      std::cout << "_, ";
+    }else{
+      std::cout << board[i] << ", ";
+    }      
   }
   std::cout << std::endl;
 }
 
-void createTree(Node * root) {
-  root->printBoard();
+void displayPossibilities(Node * node){
+  while (node->next != NULL){
+    node = node->next;
+  }
+
+  for (int i = 0; i < 9; i++){
+    if (node->board[i] == ' '){
+      std::cout << "Option " << std::to_string(i) <<": ";
+      node->printBoard(i);
+    }
+  }
 }
 
 int main() {
   Node * root;
   root = new Node(NULL);
+  bool x_turn = true;
+  int position = 0;
+  
+  while(true){
+    if (x_turn){
+      std::cout << "Choose an option to place the X: "<< std::endl;
+      displayPossibilities(root);
+      std::cin >> position;
+      root->placeX(root,position);
+      x_turn = false;
 
-  createTree(root);
-
+    }else{
+      std::cout << "Choose an option to place the O: "<< std::endl;
+      displayPossibilities(root);
+      root->placeO(root,position);
+      std::cin >> position;
+      x_turn = true;
+    }
+  }
   return 0;
 }
