@@ -78,8 +78,8 @@ int main() {
     }else{
       std::cout << "Choose an option to place the O: "<< std::endl;
       displayPossibilities(root);
-      root->placeO(root,position);
       std::cin >> position;
+      root->placeO(root,position);
       x_turn = true;
     }
   }
