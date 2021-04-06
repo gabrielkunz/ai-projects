@@ -118,16 +118,17 @@ int Game::getRemainingMoves() {
 
 Node * createTree(int remaining_moves, char board[9], int depth){
   Node * node = new Node();
+  total_children++;
 
   node->child_count = remaining_moves;
 
   if (depth > 0 && node->child_count > 0){
     node->children = new Node * [node->child_count];
+    
 
     for (int i = 0; i != node->child_count; ++i){
       node->placeX(i);
       node->children[i] = createTree(depth - 1,node->node_board, depth - 1);
-      total_children++;
     }
   }else{
     node->children = NULL;
@@ -145,7 +146,7 @@ void deleteTree(Node * node)
 {
     for (int i = 0; i != node->child_count; ++i)
         deleteTree(node->children[i]);
-    delete [] node->children; // deleting NULL is OK
+    delete [] node->children;
     delete node;
     total_children = 0;
 }
@@ -157,6 +158,8 @@ int main() {
   Game * game = new Game();
   
   while(game->getRemainingMoves() != 0){
+    std::cout << "Remaining Moves: " << game->getRemainingMoves() << std::endl;
+    std::cout << "Depth: " << depth << std::endl;
     Node * root;
     root = createTree(game->getRemainingMoves(), game->board, depth);
 
