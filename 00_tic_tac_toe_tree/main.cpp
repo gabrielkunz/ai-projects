@@ -2,9 +2,13 @@
 #include <string>
 #include <iostream>
 
+int total_children = 0;
+
 class Node {
  public:
   Node();
+  void placeX(int position);
+  void placeO(int position);
   char node_board[9];
   Node ** children;
   int child_count;
@@ -17,8 +21,8 @@ class Game {
   void placeO(int position);
   void printBoard();
   int getRemainingMoves();
- private:
   char board[9];
+ private:
   int remaining_moves;
 };
 
@@ -26,6 +30,14 @@ Node::Node() {
   for (int i = 0; i < 9; i++){
     node_board[i] = ' ';
   }
+}
+
+void Node::placeX(int position) {
+  node_board[position] = 'X';
+}
+
+void Node::placeO(int position) {
+  node_board[position] = 'O';
 }
 
 Game::Game() {
@@ -80,20 +92,55 @@ int Game::getRemainingMoves() {
   return remaining_moves;
 }
 
-Node * createTree(Game * game){
+Node * createTree(int remaining_moves, char board[9], int depth){
   Node * node = new Node();
-  node->child_count = game->getRemainingMoves();
+  bool x_turn = true;
+
+  node->child_count = remaining_moves;
+
+  if (depth > 0 && node->child_count > 0){
+    node->children = new Node * [node->child_count];
+
+    for (int i = 0; i != node->child_count; ++i){
+      if (x_turn){
+        node->placeX(i);
+        node->children[i] = createTree(depth - 1,node->node_board, depth - 1);
+        x_turn = false;
+        total_children++;
+      }else{
+        node->placeO(i);
+        node->children[i] = createTree(depth - 1,node->node_board, depth - 1);
+        x_turn = true;
+        total_children++;
+      }        
+    }
+  }else{
+    node->children = NULL;
+  }
+
   return node;
+}
+
+void deleteTree(Node * node)
+{
+    for (int i = 0; i != node->child_count; ++i)
+        deleteTree(node->children[i]);
+    delete [] node->children; // deleting NULL is OK
+    delete node;
+    total_children = 0;
 }
 
 int main() {
   bool x_turn = true;
   int position = 0;
   Game * game = new Game();
-  Node * root;
-  root = createTree(game);
   
   while(game->getRemainingMoves() != 0){
+    Node * root;
+    root = createTree(game->getRemainingMoves(), game->board, 9);
+    printf("%d",total_children);
+    std::cout << std::endl;
+
     if (x_turn){
       std::cout << "Select a position to place the X: "<< std::endl;
       game->printBoard();
@@ -108,6 +155,8 @@ int main() {
       x_turn = true;
     }
     std::cout << "\033[2J\033[1;1H";
+
+    deleteTree(root);
   }
 
   std::cout << "Game Over" << std::endl;
