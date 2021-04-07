@@ -19,12 +19,15 @@ class Game {
   void placeO(int position);
   void printBoard();
   int getRemainingMoves();
+  char getWinner();
   bool checkMove(int position);
+  char checkWinner();
   void removePosition(int position);
   char board[9];
  private:
   int remaining_moves;
   int available_positions[9];
+  char winner;
 };
 
 Node::Node() {
@@ -53,12 +56,14 @@ void Game::placeX(int position) {
   board[position] = 'X';
   remaining_moves--;
   removePosition(position);
+  winner = checkWinner();
 }
 
 void Game::placeO(int position) {
   board[position] = 'O';
   remaining_moves--;
   removePosition(position);
+  winner = checkWinner();
 }
 
 void Game::printBoard() {
@@ -120,6 +125,10 @@ int Game::getRemainingMoves() {
   return remaining_moves;
 }
 
+char Game::getWinner() {
+  return winner;
+}
+
 // This function returns true if the move entered is inside the board
 // or if it wasn't played before
 bool Game::checkMove(int position) {
@@ -133,6 +142,44 @@ bool Game::checkMove(int position) {
     return false;
   } else {
     return true;
+  }
+}
+
+// This functions returns 'X' or 'O' if someone has won the game, or '_'
+// if the game is still going. The check starts already after the first move.
+char Game::checkWinner() {
+  // Check rows
+  if (board[0] == board[1] && board[0] == board[2] && board[0] != '_') {
+    remaining_moves = 0;
+    return board[0];
+  } else if (board[3] == board[4] && board[3] == board[5] && board[3] != '_') {
+    remaining_moves = 0;
+    return board[3];
+  } else if (board[6] == board[7] && board[6] == board[8] && board[6] != '_') {
+    remaining_moves = 0;
+    return board[6];
+
+  // Check columns
+  } else if (board[0] == board[3] && board[0] == board[6] && board[0] != '_') {
+    remaining_moves = 0;
+    return board[0];
+  } else if (board[1] == board[4] && board[1] == board[7] && board[1] != '_') {
+    remaining_moves = 0;
+    return board[1];
+  } else if (board[2] == board[5] && board[5] == board[8] && board[2] != '_') {
+    remaining_moves = 0;
+    return board[2];
+
+  // Check diagonals
+  } else if (board[0] == board[4] && board[0] == board[8] && board[0] != '_') {
+    remaining_moves = 0;
+    return board[0];
+  } else if (board[2] == board[4] && board[2] == board[6] && board[2] != '_') {
+    remaining_moves = 0;
+    return board[2];
+  } else {
+    // Game still going
+    return '_';
   }
 }
 
@@ -261,8 +308,12 @@ int main() {
     depth--;
   }
 
-  std::cout << "Remaining Moves: " << game->getRemainingMoves();
-  std::cout << " - Game Over" << std::endl;
+  std::cout << "Game Over: ";
+  if (game->getWinner() == '_') {
+    std::cout << "Draw" << std::endl;
+  } else {
+    std::cout << "Player " << game->getWinner() << " won"<< std::endl;
+  }
   game->printBoard();
 
   return 0;
