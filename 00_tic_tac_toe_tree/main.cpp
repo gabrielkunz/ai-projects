@@ -5,11 +5,10 @@
 class Node {
  public:
   Node();
-  void placeX(int position);
-  void placeO(int position);
-  char node_board[9];
-  Node ** children;
+  char board[9];
   int child_count;
+  Node * children[9];
+  Node * father;
 };
 
 class Game {
@@ -31,17 +30,8 @@ class Game {
 };
 
 Node::Node() {
-  for (int i = 0; i < 9; i++) {
-    node_board[i] = '_';
-  }
-}
-
-void Node::placeX(int position) {
-  node_board[position] = 'X';
-}
-
-void Node::placeO(int position) {
-  node_board[position] = 'O';
+  for (int i = 0; i < 9; i++)
+    board[i] = '_';
 }
 
 Game::Game() {
@@ -130,13 +120,10 @@ char Game::getWinner() {
 }
 
 // This function returns true if the move entered is inside the board
-// or if it wasn't played before
+// (valid) or if it wasn't played before
 bool Game::checkMove(int position) {
   int * find_result =
     std::find(available_positions, available_positions+9, position);
-
-  std::cout << find_result << std::endl;
-  std::cout << available_positions+9 << std::endl;
 
   if (position < 0 || position > 8 || find_result == available_positions + 9) {
     return false;
@@ -196,24 +183,21 @@ void Game::removePosition(int position) {
 
 // This function creates the tree with all the possible boards for the
 // game. The root node should always contain the most up to date board.
-Node * createTree(int remaining_moves, char game_board[9], int depth) {
+Node * createTree(int remaining_moves, char game_board[9], Node * father) {
   Node * node = new Node();
 
   node->child_count = remaining_moves;
+  node->father = father;
 
-  if (depth > 0 && node->child_count > 0) {
-    node->children = new Node * [node->child_count];
-
-    for (int i = 0; i != node->child_count; ++i) {
-      for (int j = 0; j < 9; j++) {
-        node->node_board[j] = game_board[j];
-      }
-      node->children[i] = createTree(depth - 1, node->node_board, depth - 1);
+  if (node->child_count > 0) {
+    for (int i = 0; i != node->child_count; i++) {
+      node->children[i] = new Node();
+      node->children[i] = createTree(remaining_moves - 1, game_board, node);
     }
-
   } else {
-    node->children = NULL;
+    node->children[0] = NULL;
   }
+
   return node;
 }
 
@@ -221,9 +205,8 @@ Node * createTree(int remaining_moves, char game_board[9], int depth) {
 // root node. The function starts deleting its children and
 // then deletes itself.
 void deleteTree(Node * node) {
-    for (int i = 0; i != node->child_count; ++i)
+    for (int i = 0; i != node->child_count; i++)
         deleteTree(node->children[i]);
-    delete [] node->children;
     delete node;
 }
 
@@ -243,7 +226,7 @@ int countNodes(Node * node) {
 }
 
 void printNodeBoards(Node * node) {
-  std::cout << node->node_board << std::endl;
+  std::cout << node->board << std::endl;
   for (int i = 0; i != node->child_count; i++) {
     printNodeBoards(node->children[i]);
   }
@@ -252,7 +235,6 @@ void printNodeBoards(Node * node) {
 int main() {
   bool x_turn = true;
   int position = 9;
-  int depth = 9;
   Game * game = new Game();
 
   // Loop for the game input. The loop will alternate between X's and O's turns.
@@ -260,9 +242,8 @@ int main() {
   // input is requested again.
   while (game->getRemainingMoves() != 0) {
     std::cout << "Remaining Moves: " << game->getRemainingMoves() << std::endl;
-    std::cout << "Depth: " << depth << std::endl;
     Node * root;
-    root = createTree(game->getRemainingMoves(), game->board, depth);
+    root = createTree(game->getRemainingMoves(), game->board, NULL);
 
     printf("Possible boards: %d", countNodes(root) - 1);
     std::cout << std::endl;
@@ -305,7 +286,6 @@ int main() {
     std::cout << "\033[2J\033[1;1H";
 
     deleteTree(root);
-    depth--;
   }
 
   std::cout << "Game Over: ";
