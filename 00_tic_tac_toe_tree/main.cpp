@@ -8,7 +8,7 @@ class Node {
   char board[9];
   int child_count;
   Node * children[9];
-  Node * father;
+  Node * parent;
 };
 
 class Game {
@@ -183,11 +183,11 @@ void Game::removePosition(int position) {
 
 // This function creates the tree with all the possible boards for the
 // game. The root node should always contain the most up to date board.
-Node * createTree(int remaining_moves, char game_board[9], Node * father) {
+Node * createTree(int remaining_moves, char game_board[9], Node * parent) {
   Node * node = new Node();
 
   node->child_count = remaining_moves;
-  node->father = father;
+  node->parent = parent;
 
   if (node->child_count > 0) {
     for (int i = 0; i != node->child_count; i++) {
