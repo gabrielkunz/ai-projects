@@ -20,12 +20,13 @@ class Game {
   void printBoard();
   int getRemainingMoves();
   char getWinner();
+  void getAvailablePositions(int * available_positions);
   bool checkMove(int position);
   char checkWinner();
   void removePosition(int position);
   char board[9];
-  int available_positions[9];
  private:
+  int available_positions[9];
   int remaining_moves;
   char winner;
 };
@@ -120,8 +121,16 @@ char Game::getWinner() {
   return winner;
 }
 
+void Game::getAvailablePositions(int * available_positions) {
+  // The values from the array are copied to another array to avoid
+  // breaking the game when creating the node boards.
+  for (int i = 0; i < 9; i++) {
+    *(available_positions + i) = *(this->available_positions + i);
+  }
+}
+
 // This function returns true if the move entered is inside the board
-// (valid) or if it wasn't played before
+// (valid) or if it wasn't played before.
 bool Game::checkMove(int position) {
   int * find_result =
     std::find(available_positions, available_positions+9, position);
@@ -133,8 +142,6 @@ bool Game::checkMove(int position) {
   }
 }
 
-// This functions returns 'X' or 'O' if someone has won the game, or '_'
-// if the game is still going. The check starts already after the first move.
 char Game::checkWinner() {
   // Check rows
   if (board[0] == board[1] && board[0] == board[2] && board[0] != '_') {
@@ -182,7 +189,9 @@ void Game::removePosition(int position) {
   }
 }
 
-int * createNodeBoard(Node * node, char game_board[9], int * available_positions, bool x_turn) {
+void createNodeBoard(Node * node, char game_board[9], int * available_positions, bool x_turn) {
+  bool move_made = false;
+  int i = 0;
 
   // If we have the root node, then its board is the current game board
   if (node->parent == NULL) {
@@ -190,26 +199,51 @@ int * createNodeBoard(Node * node, char game_board[9], int * available_positions
       node->board[i] = game_board[i];
     }
   } else {
-    // Otherwise, the node inherits the board of its parent
+    // Otherwise, the node inherits the board of its parent and places a move
     for (int i = 0; i < 9; i++) {
       node->board[i] = (node->parent)->board[i];
     }
+
+    // Depending of the turn of the game, an X or an O is placed on the board
+    // in the first position available and updates the available_positions used
+    // for the other children
+    if (x_turn) {
+      for (int i = 0; i < 9; i++) {
+        if (*(available_positions + i) != 9 && node->board[i] != 'X' && node->board[i] != 'O') {
+          node->board[i] = 'X';
+          *(available_positions + i) = 9;
+          break;
+        }
+      }
+    } else {
+      for (int i = 0; i < 9; i++) {
+        if (*(available_positions + i) != 9 && node->board[i] != 'X' && node->board[i] != 'O') {
+          node->board[i] = 'O';
+          *(available_positions + i) = 9;
+          break;
+        }
+      }
+    }
   }
-
-  // Depending of the turn of the game, an X or an O is placed on the board
-
-  return available_positions;
 }
 
 // This function creates the tree with all the possible boards for the
 // game. The root node should always contain the most up to date board.
-Node * createTree(int remaining_moves, char game_board[9], Node * parent, int * available_positions, bool x_turn) {
+Node * createTree(int remaining_moves, char game_board[9], Node * parent, int * available_positions) {
   Node * node = new Node();
+  bool x_turn = true;
+
+  // Changes the turn based on tree level
+  if (remaining_moves % 2 == 0) {
+    x_turn = true;
+  } else {
+    x_turn = false;
+  }
 
   node->child_count = remaining_moves;
   node->parent = parent;
 
-  available_positions = createNodeBoard(node, game_board, available_positions, x_turn);
+  createNodeBoard(node, game_board, available_positions, x_turn);
   // std::cout << *(available_positions);
   // std::cout << *(available_positions + 1);
   // std::cout << *(available_positions + 2);
@@ -219,12 +253,12 @@ Node * createTree(int remaining_moves, char game_board[9], Node * parent, int * 
   // std::cout << *(available_positions + 6);
   // std::cout << *(available_positions + 7);
   // std::cout << *(available_positions + 8) << std::endl;
-  
-  // Create node children
+
+  // Create children nodes
   if (node->child_count > 0) {
     for (int i = 0; i != node->child_count; i++) {
       node->children[i] = new Node();
-      node->children[i] = createTree(remaining_moves - 1, game_board, node, available_positions, x_turn);
+      node->children[i] = createTree(remaining_moves - 1, game_board, node, available_positions);
     }
   } else {
     node->children[0] = NULL;
@@ -233,9 +267,6 @@ Node * createTree(int remaining_moves, char game_board[9], Node * parent, int * 
   return node;
 }
 
-// This function deletes the entire tree. The input is the
-// root node. The function starts deleting its children and
-// then deletes itself.
 void deleteTree(Node * node) {
     for (int i = 0; i != node->child_count; i++)
         deleteTree(node->children[i]);
@@ -258,29 +289,39 @@ int countNodes(Node * node) {
 }
 
 void printNodeBoards(Node * node) {
-  std::cout << node->board << std::endl;
-  for (int i = 0; i != node->child_count; i++) {
-    printNodeBoards(node->children[i]);
+  char input = 'n';
+
+  // std::cout << "Do you wish to print all the possible boards? [y/n]: ";
+  // std::cin >> input;
+
+  if (input == 'y') {
+    std::cout << node->board << std::endl;
+    for (int i = 0; i != node->child_count; i++) {
+      printNodeBoards(node->children[i]);
+    }
   }
 }
 
 int main() {
   bool x_turn = true;
   int position = 9;
+  int available_positions[9];
   Game * game = new Game();
 
-  // Loop for the game input. The loop will alternate between X's and O's turns.
+  // Loop for the game input. The loop will alternate between X and O turns.
   // If an invalid position is entered (smaller than 0 or greater than 8), the
   // input is requested again.
   while (game->getRemainingMoves() != 0) {
     std::cout << "Remaining Moves: " << game->getRemainingMoves() << std::endl;
+
     Node * root;
-    root = createTree(game->getRemainingMoves(), game->board, NULL, game->available_positions, x_turn);
+    game->getAvailablePositions(available_positions);
+    root = createTree(game->getRemainingMoves(), game->board, NULL, available_positions);
 
     printf("Possible boards: %d", countNodes(root) - 1);
     std::cout << std::endl;
 
-    // printNodeBoards(root);
+    printNodeBoards(root);
 
     if (x_turn) {
       std::cout << "Select a position to place the X: "<< std::endl;
