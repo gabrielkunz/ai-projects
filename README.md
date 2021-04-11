@@ -17,7 +17,7 @@ The tree is created based on the following structure.
 
 ![alt text](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2F1.bp.blogspot.com%2F-LsJinVrVFz8%2FWHoAy4WBz_I%2FAAAAAAAA6qY%2FoKyq9vlydMAH27zxhIlMxMfHCf5B0n8tQCLcB%2Fs1600%2FOXO-search-tree.jpg&f=1&nofb=1)
 
-At the root level (with the empty board), we have the following number of combinations:
+Starting at the root level 1 (with the empty board), we have the following combinations:
 
 Level 1 = 9 + 9\*8 + 9\*8\*7 + 9\*8\*7\*6 + 9\*8\*7\*6\*5 + 9\*8\*7\*6\*5\*4 + 9\*8\*7\*6\*5\*4\*3 + 9\*8\*7\*6\*5\*4\*3\*2 + 9\*8\*7\*6\*5\*4\*3\*2\*1 = 986.409 possible boards
 
