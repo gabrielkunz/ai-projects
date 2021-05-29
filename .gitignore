@@ -61,3 +61,6 @@ hs_err_pid*
 .DS_Store
 .vscode/*
 /01_jade_agents/AgentManager/nbproject/private/
+/01_jade_agents/AgentManager/build/
+01_jade_agents/AgentManager/APDescription.txt
+01_jade_agents/AgentManager/MTPs-Main-Container.txt
