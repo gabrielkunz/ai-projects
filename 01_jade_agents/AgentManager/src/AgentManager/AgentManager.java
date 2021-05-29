@@ -47,7 +47,7 @@ public class AgentManager extends Agent {
             protected void onTick()
             {
                 System.out.println("");
-                System.out.println(myAgent.getLocalName() + ":AgenteClass");
+                System.out.println(myAgent.getLocalName() + ":AgentManager");
                 System.out.println("Active: ");
                 agents = search_agents("");
                 if (agents.length == 0)
