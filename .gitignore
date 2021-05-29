@@ -60,3 +60,4 @@ hs_err_pid*
 # User ignore
 .DS_Store
 .vscode/*
+/01_jade_agents/AgentManager/nbproject/private/
