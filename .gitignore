@@ -64,3 +64,4 @@ hs_err_pid*
 /01_jade_agents/AgentManager/build/
 01_jade_agents/AgentManager/APDescription.txt
 01_jade_agents/AgentManager/MTPs-Main-Container.txt
+/01_jade_agents/AgentContractor/nbproject/private/
