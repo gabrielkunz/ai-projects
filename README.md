@@ -1,6 +1,8 @@
 # AI Projects
- 
-## Usage
+
+## Project 1: 00_tic_tac_toe_tree/
+
+### Usage
 Compile:
 ```console
 foo@bar ~ % g++ main.cpp <executable_name>.out
@@ -9,8 +11,8 @@ Execute:
 ```console
 foo@bar ~ % ./<executable_name>.out
 ```
+### Description
 
-## Program 1: 00_tic_tac_toe_tree/
 Tic Tac Toe game where a tree containing all possible boards is generated after each move. Both players enter the move on the terminal and the program will display the total number of possible boards in the tree. The tree is untrimmed, which means that it contains boards that are not possible because one of the player could have won the game already in a previous node.
 
 The tree is created based on the following structure:
@@ -36,3 +38,13 @@ Level 7 = 3 + 3\*2 + 3\*2\*1 = 15 possible boards
 Level 8 = 2 + 2\*1 = 4 possible boards
 
 Level 9 = 1 possible board
+
+## Project 2: 01_jade_agents/
+
+### Requirements
+- JDK 8: https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html
+- Apache NetBeans 12.0: https://netbeans.apache.org/download/index.html
+- Jade binaries: https://jade.tilab.com/download/jade/license/jade-download/?x=40&y=15
+
+### Usage
+1. Open both Agent projects using NetBeans IDE.
